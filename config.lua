@@ -24,7 +24,7 @@ LS_CORE_CONFIG.FRAMEWORK = "QB"
 LS_CORE_CONFIG.EVENTS = {
     PlayerLoaded = {
         ["ESX"] = "esx:playerLoaded",
-        ["QB"] = "QBCore:Client:OnPlayerLoaded",
+        ["QB"] = "QBCore:Server:PlayerLoaded",
     },
 }
 

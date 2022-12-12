@@ -17,7 +17,8 @@ server_scripts {
 	'@oxmysql/lib/MySQL.lua',
 	'server/main.lua',
 	'server/callback.lua',
-	'server/version.lua'
+	'server/version.lua',
+	'server/events.lua'
 }
 
 lua54 'yes'

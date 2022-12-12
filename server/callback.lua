@@ -19,7 +19,7 @@ end
 RegisterNetEvent('ls-core:Server:TriggerCallback', function(name, ...)
     local src = source
     LS_CORE.Callback.Functions.TriggerCallback(name, src, function(...)
-        LS_CORE.TriggerClientEvent('ls-core:Client:TriggerCallback', src, name, ...)
+        TriggerClientEvent('ls-core:Client:TriggerCallback', src, name, ...)
     end, ...)
 end)
 

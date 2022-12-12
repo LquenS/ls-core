@@ -47,8 +47,8 @@ end
 LS_CORE.Player.CreatePlayerData = function(source)
     local identifier = LS_CORE.Functions.GetPlayerIdentifier(source)
 
-    local Database = LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'fetchAll', 'SELECT * FROM ls-core where identifier = ?', { identifier }) or {}
-    local Data = json.decode(Database.data)
+    local Database = json.decode(LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'fetchAll', 'SELECT * FROM ls_core where identifier = ?', { identifier }).data) or {}
+    local Data = Database
 
     Data.identifier = identifier
     Data.Reputation = Data.Reputation or 0
@@ -166,15 +166,15 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
 
     
 
-    self.Function.GetPlayerMoney = function(type)
+    self.Functions.GetPlayerMoney = function(type)
         if (LS_CORE.Config.FRAMEWORK == "QB") then
-            return self.Player.PlayerData.money["type"]
+            return self.Player.PlayerData.money[type]
         elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
             return self.Player.getAccount(type).money
         end 
     end
 
-    self.Function.AddMoney = function(type, amount, reason)
+    self.Functions.AddMoney = function(type, amount, reason)
         if (LS_CORE.Config.FRAMEWORK == "QB") then
             self.Player.Functions.AddMoney(type, amount, reason)
         elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
@@ -182,7 +182,7 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
         end 
     end
 
-    self.Function.RemoveMoney = function(type, amount, reason)
+    self.Functions.RemoveMoney = function(type, amount, reason)
         if (LS_CORE.Config.FRAMEWORK == "QB") then
             self.Player.Functions.RemoveMoney(type, amount, reason)
         elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
@@ -199,16 +199,27 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
 
     LS_CORE.Players[self.Source] = self
     self.Functions.SetPlayerData(self.DATA)
+
+    RconPrint("[ls-core] Player "..self.Identifier.." has succesfully logged!\n")
     return self
 end
 
 function LS_CORE.Player.Save(source)
     local PlayerData = LS_CORE.Players[source]
     if PlayerData then
-        LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'UPDATE `ls-core` SET `data` = @data WHERE `identifier` = @identifier', {
-            ['@identifier'] = PlayerData.identifier,
-            ['@data']       = json.encode(PlayerData.DATA),
-        })
+        local IsValid = LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'fetchAll', 'SELECT * FROM ls_core where identifier = ?', { PlayerData.Identifier })
+        if IsValid[1] then
+            LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'UPDATE `ls_core` SET `data` = @data WHERE `identifier` = @identifier', {
+                ['@identifier'] = PlayerData.Identifier,
+                ['@data']       = json.encode(PlayerData.DATA),
+            })
+        else
+            LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'INSERT INTO `ls_core` (identifier, data) VALUES (:identifier, :data)', {
+                identifier = PlayerData.Identifier,
+                data = json.encode(PlayerData.DATA),
+            })
+        end
+
     else
         RconPrint("[ls-core] PLAYER CANNOT FOUND\n")
     end
@@ -217,16 +228,12 @@ end
 
 AddEventHandler('playerDropped', function()
     local src = source
-    if not  LS_CORE.Players[src] then return end
+    if not LS_CORE.Players[src] then return end
     local Player = LS_CORE.Players[src]
     
     Player.Functions.Save()
     LS_CORE.Players[src] = nil
 end)
-
-
-
-
 
 exports('GetCoreObject', function()
     return LS_CORE
