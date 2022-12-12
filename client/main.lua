@@ -1,8 +1,8 @@
 LS_CORE = { }
 LS_CORE.Config = LS_CORE_CONFIG
-LS_CORE.PLAYER_DATA
+LS_CORE.PLAYER_DATA = {}
 
-RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
+RegisterNetEvent('LS_CORE:PLAYER:SETPLAYERDATA', function(val)
     LS_CORE.PLAYER_DATA = val
 end)
 
