@@ -190,6 +190,15 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
         end 
     end
 
+    self.Functions.GetProfile = function()
+        if (LS_CORE.Config.FRAMEWORK == "QB") then
+            return self.Player.PlayerData.charinfo
+        elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+            local result = LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'fetchAll', 'SELECT * FROM users where identifier = ?', { self.Identifier })
+            return result[1]
+        end 
+    end
+
 
 
 
