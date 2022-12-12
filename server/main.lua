@@ -1,0 +1,233 @@
+LS_CORE = { }
+LS_CORE.Config = LS_CORE_CONFIG
+LS_CORE.Functions = {}
+LS_CORE.Player = {} 
+LS_CORE.Players = {} 
+
+
+if (LS_CORE.Config.FRAMEWORK == "QB") then
+    QBCore = exports['qb-core']:GetCoreObject()
+elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+    ESX = nil
+
+    Citizen.CreateThread(function() while ESX == nil do TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end) Citizen.Wait(30) end end)
+end
+
+LS_CORE.Functions.GetPlayer = function (source)
+    local Player = LS_CORE.Players[source]
+
+    return Player
+end
+
+LS_CORE.Functions.GetPlayerFramework = function (source)
+    local Player = nil
+    if (LS_CORE.Config.FRAMEWORK == "QB") then
+        Player =  QBCore.Functions.GetPlayer(source)
+    elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+        Player =  ESX.GetPlayerFromId(source)
+    end
+     
+
+    return Player
+end
+
+LS_CORE.Functions.GetPlayerIdentifier = function (source)
+    local Identifier = nil
+    if (LS_CORE.Config.FRAMEWORK == "QB") then
+        Identifier=  LS_CORE.Functions.GetPlayerFramework(source).PlayerData.citizenid
+    elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+        Identifier=  LS_CORE.Functions.GetPlayerFramework(source).identifier
+    end
+     
+
+    return Identifier
+end
+
+
+LS_CORE.Player.CreatePlayerData = function(source)
+    local identifier = LS_CORE.Functions.GetPlayerIdentifier(source)
+
+    local Database = LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'fetchAll', 'SELECT * FROM ls-core where identifier = ?', { identifier }) or {}
+    local Data = json.decode(Database.data)
+
+    Data.identifier = identifier
+    Data.Reputation = Data.Reputation or 0
+    Data.XP = Data.XP or 0
+    Data.Skills = Data.Skills or { }
+    
+
+    LS_CORE.Player.CreatePlayer(source, Data)
+end
+
+LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
+    local self = {}
+    self.Functions = {}
+    
+    self.Source = source
+    self.Identifier = PLAYER_DATA.identifier
+    self.DATA = PLAYER_DATA
+    self.Player = LS_CORE.Functions.GetPlayerFramework(self.Source)
+    
+    
+    self.Functions.GetPlayerData = function ()
+        return self.DATA
+    end
+
+    self.Functions.SetPlayerData = function (PlayerInfo)
+        self.DATA = PlayerInfo
+
+        TriggerEvent('LS_CORE:PLAYER:SETPLAYERDATA', self.DATA)
+        TriggerClientEvent('LS_CORE:PLAYER:SETPLAYERDATA', self.Source, self.DATA)
+
+        return self.DATA
+    end
+
+
+
+
+    self.Functions.Experience = function(type, amount)
+        if (type == "ADD") then
+            self.DATA.XP = tonumber(self.DATA.XP) + tonumber(amount)
+        elseif (type == "REMOVE") then
+            self.DATA.XP = tonumber(self.DATA.XP) - tonumber(amount)
+        elseif (type == "RESET") then
+            self.DATA.XP = 0
+        end
+
+        self.Functions.SetPlayerData(self.DATA)
+
+        if tonumber(self.DATA.XP) >= LS_CORE.Config[tonumber(self.DATA.Reputation + 1)] then
+            self.Functions.Reputation("ADD", 1)
+            self.Functions.Experience("RESET", nil)
+        end
+    end
+
+    
+    
+    self.Functions.Reputation = function(type, amount)
+        if (type == "ADD") then
+            self.DATA.Reputation = tonumber(self.DATA.Reputation) + tonumber(amount)
+        elseif (type == "REMOVE") then
+            self.DATA.Reputation = tonumber(self.DATA.Reputation) - tonumber(amount)
+        elseif (type == "RESET") then
+            self.DATA.Reputation = 0
+        end
+
+        self.Functions.SetPlayerData(self.DATA)
+    end
+
+
+
+    self.Functions.AddItem = function(item, amount, slot, info)
+        if GetResourceState("ls-inventoryhud") ~= 'missing' then
+            exports["ls-inventoryhud"]:AddItem(self.Source, item, amount, info)
+        else
+            if (LS_CORE.Config.FRAMEWORK == "QB") then
+                self.Player.Functions.AddItem(item, amount, slot, info)
+            elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+                self.Player.addInventoryItem(item, amount)
+            end 
+        end
+    end
+
+    self.Functions.RemoveItem = function(item, amount, slot)
+        if GetResourceState("ls-inventoryhud") ~= 'missing' then
+            exports["ls-inventoryhud"]:RemoveItem(self.PlayerData.source, slot, amount)
+        else
+            if (LS_CORE.Config.FRAMEWORK == "QB") then
+                self.Player.Functions.RemoveItem(item, amount, slot)
+            elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+                self.Player.removeInventoryItem(item, amount)
+            end 
+        end
+    end
+
+    self.Functions.GetItem = function(item)
+        if GetResourceState("ls-inventoryhud") ~= 'missing' then
+            local foundItem = exports["ls-inventoryhud"]:GetItem(self.PlayerData.source, item)
+            if foundItem == nil then
+                for _,v in pairs ( exports["ls-inventoryhud"]:GetItems(self.PlayerData.source) ) do
+                    if (v._tpl == item) then
+                        foundItem = v
+                        break
+                    end
+                end
+            end
+
+            return foundItem
+        else
+            if (LS_CORE.Config.FRAMEWORK == "QB") then
+                return self.Player.Functions.GetItemByName(item)
+            elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+                return self.Player.getItem(item)
+            end 
+        end
+    end
+
+    
+
+    self.Function.GetPlayerMoney = function(type)
+        if (LS_CORE.Config.FRAMEWORK == "QB") then
+            return self.Player.PlayerData.money["type"]
+        elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+            return self.Player.getAccount(type).money
+        end 
+    end
+
+    self.Function.AddMoney = function(type, amount, reason)
+        if (LS_CORE.Config.FRAMEWORK == "QB") then
+            self.Player.Functions.AddMoney(type, amount, reason)
+        elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+            self.Player.addAccountMoney(type, amount)
+        end 
+    end
+
+    self.Function.RemoveMoney = function(type, amount, reason)
+        if (LS_CORE.Config.FRAMEWORK == "QB") then
+            self.Player.Functions.RemoveMoney(type, amount, reason)
+        elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+            self.Player.removeAccountMoney(type, amount)
+        end 
+    end
+
+
+
+
+    self.Functions.Save = function()
+        LS_CORE.Player.Save(self.Source)
+    end
+
+    LS_CORE.Players[self.Source] = self
+    self.Functions.SetPlayerData(self.DATA)
+    return self
+end
+
+function LS_CORE.Player.Save(source)
+    local PlayerData = LS_CORE.Players[source]
+    if PlayerData then
+        LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'UPDATE `ls-core` SET `data` = @data WHERE `identifier` = @identifier', {
+            ['@identifier'] = PlayerData.identifier,
+            ['@data']       = json.encode(PlayerData.DATA),
+        })
+    else
+        RconPrint("[ls-core] PLAYER CANNOT FOUND\n")
+    end
+end
+
+
+AddEventHandler('playerDropped', function()
+    local src = source
+    if not  LS_CORE.Players[src] then return end
+    local Player = LS_CORE.Players[src]
+    
+    Player.Functions.Save()
+    LS_CORE.Players[src] = nil
+end)
+
+
+
+
+
+exports('GetCoreObject', function()
+    return LS_CORE
+end)

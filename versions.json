@@ -1,0 +1,8 @@
+[
+	{
+		"version": "1.0.0",
+		"version_name": "Release",
+		"version_desc": "First release of core.",
+		"name": "ls-core"
+    }
+]

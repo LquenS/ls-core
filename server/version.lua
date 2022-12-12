@@ -1,0 +1,29 @@
+LS_CORE.Functions.GetVersionScript = function(CURRENT_VERSION, SCRIPT_NAME)
+    PerformHttpRequest("https://raw.githubusercontent.com/LquenS/ls-core/main/versions.json", function (_, data, __)
+        local SCRIPT_LIST = json.decode(RemoveLastLine(data))
+        for _, value in pairs ( SCRIPT_LIST ) do 
+            if value.name == SCRIPT_NAME then
+                print("[ls-core] " .. SCRIPT_NAME .. " checking started.")
+                Citizen.Wait(500)
+                if value.version == CURRENT_VERSION then
+                    print("[ls-core] " ..SCRIPT_NAME.. " version is latest\n[ls-core] Version name " .. value.version_name..".\n".."[ls-core] " .. value.version_desc..".")
+                else
+                    print("[ls-core] " ..SCRIPT_NAME.. " is outdated, needs to be updated!\n[ls-core] Latest version is " .. value.version .. ".")
+                end
+            end
+        end
+    end)
+end
+
+function RemoveLastLine(str)
+    local pos = 0
+    
+    while true do local nl = string.find(str, "\n", pos, true) if not nl then break end pos = nl + 1 end
+
+    if pos == 0 then return str end
+
+    return string.sub(str, 1, pos - 2)
+end
+
+
+LS_CORE.Functions.GetVersionScript(LS_CORE.Config.VERSION, "ls-core")
