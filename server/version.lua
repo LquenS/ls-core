@@ -1,5 +1,5 @@
 LS_CORE.Functions.GetVersionScript = function(CURRENT_VERSION, SCRIPT_NAME)
-    PerformHttpRequest("https://raw.githubusercontent.com/LquenS/ls-core/main/versions.json?token=GHSAT0AAAAAAB4JAJD4DRBNO5RITOPDFS5GY4XCJSQ", function (_, data, __)
+    PerformHttpRequest("https://raw.githubusercontent.com/LquenS/ls-core/main/versions.json", function (_, data, __)
         if data ~= nil then
             local SCRIPT_LIST = json.decode(RemoveLastLine(data))
             for _, value in pairs ( SCRIPT_LIST ) do 
