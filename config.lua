@@ -1,6 +1,6 @@
 LS_CORE_CONFIG = { }
 
-LS_CORE_CONFIG.VERSION = "1.0.0"
+LS_CORE_CONFIG.VERSION = "1.0.1"
 
 LS_CORE_CONFIG.Reputation = {
     ["1"] = 480,

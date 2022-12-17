@@ -56,7 +56,10 @@ LS_CORE.Player.CreatePlayerData = function(source)
     Data.Skills = Data.Skills or { }
     
 
-    LS_CORE.Player.CreatePlayer(source, Data)
+    local createdUser = LS_CORE.Player.CreatePlayer(source, Data)
+
+    TriggerClientEvent("LS_CORE:PLAYER:CREATED", source, createdUser)
+    TriggerEvent("LS_CORE:PLAYER:CREATED", createdUser)
 end
 
 LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
