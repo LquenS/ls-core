@@ -23,3 +23,5 @@ Citizen.CreateThread(function()
     Citizen.Wait(1000)
     LS_CORE.Functions.GetVersionScript(LS_CORE.Config.VERSION, "ls-core")
 end)
+
+exports("CheckVersion", LS_CORE.Functions.GetVersionScript)
