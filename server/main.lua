@@ -171,7 +171,8 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
 
     self.Functions.GetPlayerMoney = function(type)
         if (LS_CORE.Config.FRAMEWORK == "QB") then
-            return self.Player.PlayerData.money[type]
+			local PlayerFUN = QBCore.Functions.GetPlayer(self.Source)
+            return PlayerFUN.PlayerData.money[type]
         elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
             return self.Player.getAccount(type).money
         end 

@@ -3,12 +3,6 @@
 LS_CORE.Callback = {}
 LS_CORE.Callback.Functions = {}
 LS_CORE.Callback.ServerCallbacks = {}
-LS_CORE.Callback.ClientCallbacks = {}
-
-LS_CORE.Callback.Functions.TriggerClientCallback = function(name, source, cb, ...)
-    LS_CORE.Callback.ClientCallbacks[name] = cb
-    TriggerClientEvent('QBCore:Client:TriggerClientCallback', source, name, ...)
-end
 
 LS_CORE.Callback.Functions.CreateCallback = function(name, cb)
     LS_CORE.Callback.ServerCallbacks[name] = cb
