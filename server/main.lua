@@ -46,8 +46,12 @@ end
 
 LS_CORE.Player.CreatePlayerData = function(source)
     local identifier = LS_CORE.Functions.GetPlayerIdentifier(source)
-
-    local Database = json.decode(LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'fetchAll', 'SELECT * FROM ls_core where identifier = ?', { identifier }).data) or {}
+	
+	local Database = {}
+	local result = LS_CORE.Config.DATABASE(LS_CORE.Config.DATABASE_NAME, 'fetchAll', 'SELECT * FROM ls_core where identifier = ?', { identifier })
+	if result[1] ~= nil then
+		Database = json.decode(result[1].data)
+	end
     local Data = Database
 
     Data.identifier = identifier
@@ -99,7 +103,7 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
 
         self.Functions.SetPlayerData(self.DATA)
 
-        if tonumber(self.DATA.XP) >= LS_CORE.Config[tonumber(self.DATA.Reputation + 1)] then
+        if tonumber(self.DATA.XP) >= LS_CORE.Config.Reputation[tostring(tonumber(self.DATA.Reputation) + 1)] then
             self.Functions.Reputation("ADD", 1)
             self.Functions.Experience("RESET", nil)
         end
@@ -227,9 +231,13 @@ function LS_CORE.Player.Save(source)
                 ['@data']       = json.encode(PlayerData.DATA),
             })
         else
-            LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'INSERT INTO `ls_core` (identifier, data) VALUES (:identifier, :data)', {
-                identifier = PlayerData.Identifier,
-                data = json.encode(PlayerData.DATA),
+            -- LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'INSERT INTO `ls_core` (identifier, data) VALUES (:identifier, :data)', {
+                -- identifier = PlayerData.Identifier,
+                -- data = json.encode(PlayerData.DATA),
+            -- })
+			LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'INSERT INTO `ls_core` (identifier, data) VALUES (@identifier, @data)', {
+                ["@identifier"] = PlayerData.Identifier,
+                ["data"] = json.encode(PlayerData.DATA),
             })
         end
 
