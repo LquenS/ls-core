@@ -178,8 +178,8 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
 			local PlayerFUN = QBCore.Functions.GetPlayer(self.Source)
             return PlayerFUN.PlayerData.money[type]
         elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
-			local PlayerFUN = ESX.GetPlayerFromId(self.source)
-            return PlayerFUN.getAccount(type).money
+			if type == "cash" then type = "money" end
+            return self.Player.getAccount(type).money
         end 
     end
 
@@ -187,6 +187,7 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
         if (LS_CORE.Config.FRAMEWORK == "QB") then
             self.Player.Functions.AddMoney(type, amount, reason)
         elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+			if type == "cash" then type = "money" end
             self.Player.addAccountMoney(type, amount)
         end 
     end
@@ -195,6 +196,7 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
         if (LS_CORE.Config.FRAMEWORK == "QB") then
             self.Player.Functions.RemoveMoney(type, amount, reason)
         elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+			if type == "cash" then type = "money" end
             self.Player.removeAccountMoney(type, amount)
         end 
     end
