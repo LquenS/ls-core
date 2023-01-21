@@ -15,9 +15,11 @@ end
 
 LS_CORE.Functions.GetPlayer = function (source)
     local Player = LS_CORE.Players[source]
-
+	Player.RefreshPlayer()
+	
     return Player
 end
+
 
 LS_CORE.Functions.GetPlayerFramework = function (source)
     local Player = nil
@@ -30,6 +32,19 @@ LS_CORE.Functions.GetPlayerFramework = function (source)
 
     return Player
 end
+
+LS_CORE.Functions.GetPlayerFrameworkIdentifier = function (identifier)
+    local Player = nil
+    if (LS_CORE.Config.FRAMEWORK == "QB") then
+        Player =  QBCore.Functions.GetPlayerByCitizenId(identifier)
+    elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+        Player =  ESX.GetPlayerFromIdentifier(identifier)
+    end
+     
+
+    return Player
+end
+
 
 LS_CORE.Functions.GetPlayerIdentifier = function (source)
     local Identifier = nil
@@ -74,6 +89,10 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
     self.Identifier = PLAYER_DATA.identifier
     self.DATA = PLAYER_DATA
     self.Player = LS_CORE.Functions.GetPlayerFramework(self.Source)
+	
+	self.RefreshPlayer = function ()
+		self.Player = LS_CORE.Functions.GetPlayerFramework(self.Source)
+	end
     
     
     self.Functions.GetPlayerData = function ()

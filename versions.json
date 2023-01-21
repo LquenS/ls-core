@@ -16,5 +16,11 @@
 		"version_name": "Release",
 		"version_desc": "First release of WeaponShop script.",
 		"name": "ls-weaponshop"
+    },
+	{
+		"version": "1.0.0",
+		"version_name": "Release",
+		"version_desc": "First release of MDT script.",
+		"name": "ls-mdt"
     }
 ]
