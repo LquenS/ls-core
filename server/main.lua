@@ -15,11 +15,29 @@ end
 
 LS_CORE.Functions.GetPlayer = function (source)
     local Player = LS_CORE.Players[source]
+	if Player == nil then return nil end
 	Player.RefreshPlayer()
 	
     return Player
 end
+exports('GetPlayer', function(source)
+    return LS_CORE.Functions.GetPlayer(source)
+end)
 
+LS_CORE.Functions.GetIdentifier = function (id)
+    for src in pairs(LS_CORE.Players) do
+        if LS_CORE.Players[src].DATA.identifier == id then
+            local Player = LS_CORE.Players[src]
+            Player.RefreshPlayer()
+
+            return Player
+        end
+    end
+    return nil
+end
+exports('GetIdentifier', function(id)
+    return LS_CORE.Functions.GetIdentifier(id)
+end)
 
 LS_CORE.Functions.GetPlayerFramework = function (source)
     local Player = nil

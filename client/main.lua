@@ -4,15 +4,33 @@ LS_CORE.PLAYER_DATA = {}
 
 LS_CORE.Functions = {}
 
+if (LS_CORE.Config.FRAMEWORK == "QB") then
+    QBCore = exports['qb-core']:GetCoreObject()
+elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+    ESX = nil
+    Citizen.CreateThread(function() while ESX == nil do TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end) Citizen.Wait(30) end end)
+end
+
 RegisterNetEvent('LS_CORE:PLAYER:SETPLAYERDATA', function(val)
     LS_CORE.PLAYER_DATA = val
 end)
 
 LS_CORE.Functions.GetPlayerData = function()
+	LS_CORE.PLAYER_DATA.PlayerData = LS_CORE.Functions.GetPlayerDataFromFramework()
+	
     return LS_CORE.PLAYER_DATA
 end
 
-
+LS_CORE.Functions.GetPlayerDataFromFramework = function ()
+    local Player = nil
+    if (LS_CORE.Config.FRAMEWORK == "QB") then
+        Player =  QBCore.Functions.GetPlayerData()
+    elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+        Player =  ESX.GetPlayerData()
+    end
+	
+    return Player
+end
 
 LS_CORE.Functions.GetPeds = function(ignoreList)
     local pedPool = GetGamePool('CPed')
