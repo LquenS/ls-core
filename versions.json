@@ -1,8 +1,8 @@
 [
 	{
-		"version": "1.0.1",
+		"version": "1.0.2",
 		"version_name": "Update",
-		"version_desc": "Most updates publised, CORE more stabilized.",
+		"version_desc": "GetIdentifier added, few functions added too.",
 		"name": "ls-core"
     },
 	{
