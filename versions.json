@@ -17,10 +17,10 @@
 		"version_desc": "First release of WeaponShop script.",
 		"name": "ls-weaponshop"
     },
-	{
-		"version": "1.0.1",
-		"version_name": "Release",
-		"version_desc": "Few bugs fixed.",
-		"name": "ls-mdt"
+    {
+        "version": "1.0.2",
+        "version_name": "license Rework",
+        "version_desc": "License system has been reworked, bugs fixed.",
+        "name": "ls-mdt"
     }
 ]
