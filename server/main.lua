@@ -91,12 +91,29 @@ LS_CORE.Player.CreatePlayerData = function(source)
     Data.Reputation = Data.Reputation or 0
     Data.XP = Data.XP or 0
     Data.Skills = Data.Skills or { }
-    
+    Data.cid = Data.cid or LS_CORE.Player.CreateCustomID(identifier)
+    Data.charinfo = Data.charinfo or LS_CORE.Player.CreateCharInfo(identifier) or { firstname = "none", lastname = "none", birthdate = "00/00/0000" }
+
 
     local createdUser = LS_CORE.Player.CreatePlayer(source, Data)
 
     TriggerClientEvent("LS_CORE:PLAYER:CREATED", source, createdUser)
     TriggerEvent("LS_CORE:PLAYER:CREATED", createdUser)
+end
+
+function LS_CORE.Player.CreateCharInfo(id)
+    local Player = LS_CORE.Functions.GetPlayerFrameworkIdentifier(id)
+    if Player == nil then return end
+    if (LS_CORE.Config.FRAMEWORK == "QB") then
+        return { firstname = Player.PlayerData.charinfo.firstname, lastname = Player.PlayerData.charinfo.lastname, birthdate = Player.PlayerData.charinfo.birthdate }
+    elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+        local result = LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'fetchAll', 'SELECT firstname, lastname, dateofbirth FROM users WHERE identifier = @identifier', {
+            ['@identifier'] = Player.identifier
+        })
+
+        return { firstname = result[1].firstname, lastname = result[1].lastname, birthdate = result[1].dateofbirth }
+    end  
+    
 end
 
 LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
@@ -286,6 +303,25 @@ function LS_CORE.Player.Save(source)
     end
 end
 
+function LS_CORE.Player.CreateCustomID(identifier)
+    if (LS_CORE.Config.FRAMEWORK == "QB") then return identifier end
+
+    local fnd = true
+    local cid = nil
+    while fnd do
+        cid = tostring(LS_CORE.Config.RandomStr(3) .. LS_CORE.Config.RandomInt(5)):upper()
+        local result = LS_CORE.Config.DATABASE(LS_CORE.Config.DATABASE_NAME, "fetchAll", 'SELECT * FROM ls_core', { })
+        for _,v in pairs( result ) do
+            if json.decode(v.data) ~= nil then
+                if json.decode(v.data.cid) == cid then
+                    fnd = false
+                end
+            end
+        end
+    end
+    return cid
+end
+
 
 AddEventHandler('playerDropped', function()
     local src = source
@@ -294,6 +330,90 @@ AddEventHandler('playerDropped', function()
     
     Player.Functions.Save()
     LS_CORE.Players[src] = nil
+end)
+
+
+RegisterCommand("saveplayer", function(src)
+    if src ~= 0 then
+        if not LS_CORE.Players[src] then return end
+
+        local Player = LS_CORE.Players[src]
+        
+        Player.Functions.Save()
+        LS_CORE.Players[src] = nil
+    end
+end)
+
+RegisterCommand("relog", function(src)
+    if src ~= 0 then
+        if not LS_CORE.Players[src] then LS_CORE.Player.CreatePlayerData(src) return end
+        
+        local Player = LS_CORE.Players[src]
+        
+        Player.Functions.Save()
+        LS_CORE.Players[src] = nil
+
+        Citizen.Wait(500)
+        LS_CORE.Player.CreatePlayerData(src)
+    end
+end)
+
+RegisterCommand("convertplayers", function(src)
+    if src == 0 then
+
+        if (LS_CORE.Config.FRAMEWORK == "QB") then
+            local result = LS_CORE.Config.DATABASE(LS_CORE.Config.DATABASE_NAME, "fetchAll", 'SELECT * FROM players', { })
+            for _,v in pairs( result ) do
+                if v ~= nil then
+                    local result2 = LS_CORE.Config.DATABASE(LS_CORE.Config.DATABASE_NAME, 'fetchAll', 'SELECT * FROM ls_core where identifier = ?', { v.citizenid })
+                    if result2[1] == nil then
+                        v.charinfo = json.decode(v.charinfo)
+                        local Data = {}
+                        local identifier = v.citizenid
+
+                        Data.identifier = identifier
+                        Data.Reputation = 0
+                        Data.XP = 0
+                        Data.Skills = { }
+                        Data.cid = LS_CORE.Player.CreateCustomID(identifier)
+                        Data.charinfo = { firstname = v.charinfo.firstname, lastname = v.charinfo.lastname, birthdate = v.charinfo.birthdate } or { firstname = "none", lastname = "none", birthdate = "00/00/0000" }
+
+                        LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'INSERT INTO `ls_core` (identifier, data) VALUES (@identifier, @data)', {
+                            ["@identifier"] = identifier,
+                            ["data"] = json.encode(Data),
+                        })
+                    end
+                end
+            end
+            
+        elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
+            local result = LS_CORE.Config.DATABASE(LS_CORE.Config.DATABASE_NAME, "fetchAll", 'SELECT * FROM users', { })
+            for _,v in pairs( result ) do
+                if v ~= nil then
+                    local result2 = LS_CORE.Config.DATABASE(LS_CORE.Config.DATABASE_NAME, 'fetchAll', 'SELECT * FROM ls_core where identifier = ?', { v.identifier })
+                    if result2[1] == nil then
+                        local Data = {}
+                        local identifier = v.identifier
+
+                        Data.identifier = identifier
+                        Data.Reputation = 0
+                        Data.XP = 0
+                        Data.Skills = { }
+                        Data.cid = LS_CORE.Player.CreateCustomID(identifier)
+                        Data.charinfo = { firstname = v.firstname, lastname = v.lastname, birthdate = v.birthdate } or { firstname = "none", lastname = "none", birthdate = "00/00/0000" }
+
+                        LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'INSERT INTO `ls_core` (identifier, data) VALUES (@identifier, @data)', {
+                            ["@identifier"] = identifier,
+                            ["data"] = json.encode(Data),
+                        })
+                    end
+                end
+            end
+        end
+        
+    else
+        print( "This command only used by server console, " .. src .. " tried to use." )
+    end
 end)
 
 exports('GetCoreObject', function()

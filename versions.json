@@ -1,8 +1,8 @@
 [
 	{
-		"version": "1.0.2",
+		"version": "1.0.3",
 		"version_name": "Update",
-		"version_desc": "GetIdentifier added, few functions added too.",
+		"version_desc": "New citizenid added, charinfo added.",
 		"name": "ls-core"
     },
 	{
@@ -22,5 +22,11 @@
         "version_name": "license Rework",
         "version_desc": "License system has been reworked, bugs fixed.",
         "name": "ls-mdt"
+    },
+	{
+        "version": "1.0.0",
+        "version_name": "Released",
+        "version_desc": "MDT Version 2 has been released.",
+        "name": "ls-mdt-v2"
     }
 ]

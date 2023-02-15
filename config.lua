@@ -1,6 +1,6 @@
 LS_CORE_CONFIG = { }
 
-LS_CORE_CONFIG.VERSION = "1.0.2"
+LS_CORE_CONFIG.VERSION = "1.0.3"
 
 LS_CORE_CONFIG.Reputation = {
     ["1"] = 480,
@@ -63,4 +63,21 @@ LS_CORE_CONFIG.DATABASE                         = function(plugin,type,query,var
         end)
     end
     return Citizen.Await(wait)
+end
+
+local StringCharset = {}
+local NumberCharset = {}
+
+for i = 48, 57 do NumberCharset[#NumberCharset + 1] = string.char(i) end
+for i = 65, 90 do StringCharset[#StringCharset + 1] = string.char(i) end
+for i = 97, 122 do StringCharset[#StringCharset + 1] = string.char(i) end
+
+function LS_CORE_CONFIG.RandomStr(length)
+    if length <= 0 then return '' end
+    return LS_CORE_CONFIG.RandomStr(length - 1) .. StringCharset[math.random(1, #StringCharset)]
+end
+
+function LS_CORE_CONFIG.RandomInt(length)
+    if length <= 0 then return '' end
+    return LS_CORE_CONFIG.RandomInt(length - 1) .. NumberCharset[math.random(1, #NumberCharset)]
 end
