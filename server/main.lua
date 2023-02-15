@@ -310,13 +310,10 @@ function LS_CORE.Player.CreateCustomID(identifier)
     local cid = nil
     while fnd do
         cid = tostring(LS_CORE.Config.RandomStr(3) .. LS_CORE.Config.RandomInt(5)):upper()
-        local result = LS_CORE.Config.DATABASE(LS_CORE.Config.DATABASE_NAME, "fetchAll", 'SELECT * FROM ls_core', { })
-        for _,v in pairs( result ) do
-            if json.decode(v.data) ~= nil then
-                if json.decode(v.data.cid) == cid then
-                    fnd = false
-                end
-            end
+		local query = '%' .. cid .. '%'
+        local result = MySQL.prepare.await('SELECT COUNT(*) as count FROM ls_core WHERE data LIKE ?', { query })
+		if result == 0 then
+            fnd = false
         end
     end
     return cid
@@ -330,32 +327,6 @@ AddEventHandler('playerDropped', function()
     
     Player.Functions.Save()
     LS_CORE.Players[src] = nil
-end)
-
-
-RegisterCommand("saveplayer", function(src)
-    if src ~= 0 then
-        if not LS_CORE.Players[src] then return end
-
-        local Player = LS_CORE.Players[src]
-        
-        Player.Functions.Save()
-        LS_CORE.Players[src] = nil
-    end
-end)
-
-RegisterCommand("relog", function(src)
-    if src ~= 0 then
-        if not LS_CORE.Players[src] then LS_CORE.Player.CreatePlayerData(src) return end
-        
-        local Player = LS_CORE.Players[src]
-        
-        Player.Functions.Save()
-        LS_CORE.Players[src] = nil
-
-        Citizen.Wait(500)
-        LS_CORE.Player.CreatePlayerData(src)
-    end
 end)
 
 RegisterCommand("convertplayers", function(src)
