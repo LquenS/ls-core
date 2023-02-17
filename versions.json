@@ -1,8 +1,8 @@
 [
 	{
-		"version": "1.0.3",
-		"version_name": "Update",
-		"version_desc": "New citizenid added, charinfo added.",
+		"version": "1.0.4",
+		"version_name": "Auto Checker",
+		"version_desc": "Auto Framework checker added(IN TEST), endless loop fixed.",
 		"name": "ls-core"
     },
 	{

@@ -1,6 +1,6 @@
 LS_CORE_CONFIG = { }
 
-LS_CORE_CONFIG.VERSION = "1.0.3"
+LS_CORE_CONFIG.VERSION = "1.0.4"
 
 LS_CORE_CONFIG.Reputation = {
     ["1"] = 480,
@@ -19,7 +19,7 @@ LS_CORE_CONFIG.Reputation = {
 
 
 
-LS_CORE_CONFIG.FRAMEWORK = "QB"
+LS_CORE_CONFIG.FRAMEWORK = GetResourceState("es_extended") ~= nil and "ESX" or "QB"
 
 LS_CORE_CONFIG.EVENTS = {
     PlayerLoaded = {

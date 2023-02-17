@@ -311,14 +311,13 @@ function LS_CORE.Player.CreateCustomID(identifier)
     while fnd do
         cid = tostring(LS_CORE.Config.RandomStr(3) .. LS_CORE.Config.RandomInt(5)):upper()
 		local query = '%' .. cid .. '%'
-        local result = MySQL.prepare.await('SELECT COUNT(*) as count FROM ls_core WHERE data LIKE ?', { query })
-		if result == 0 then
+        local result = LS_CORE.Config.DATABASE(LS_CORE.Config.DATABASE_NAME, "fetchAll", 'SELECT COUNT(*) as count FROM ls_core WHERE data LIKE ?', { query })
+		if result[1].count == 0 then
             fnd = false
         end
     end
     return cid
 end
-
 
 AddEventHandler('playerDropped', function()
     local src = source
