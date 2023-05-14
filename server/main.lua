@@ -8,9 +8,7 @@ LS_CORE.Players = {}
 if (LS_CORE.Config.FRAMEWORK == "QB") then
     QBCore = exports['qb-core']:GetCoreObject()
 elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
-    ESX = nil
-
-    Citizen.CreateThread(function() while ESX == nil do TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end) Citizen.Wait(30) end end)
+    ESX = exports['es_extended']:getSharedObject()
 end
 
 LS_CORE.Functions.GetPlayer = function (source)
