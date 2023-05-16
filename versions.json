@@ -28,5 +28,11 @@
         "version_name": "Released",
         "version_desc": "MDT Version 2 has been released.",
         "name": "ls-mdt-v2"
+    },
+	{
+        "version": "0.9.9",
+        "version_name": "Development",
+        "version_desc": "New updates, fixes and phone improvements made.",
+        "name": "ls-phone"
     }
 ]
