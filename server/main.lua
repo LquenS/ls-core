@@ -8,9 +8,7 @@ LS_CORE.Players = {}
 if (LS_CORE.Config.FRAMEWORK == "QB") then
     QBCore = exports['qb-core']:GetCoreObject()
 elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
-    ESX = nil
-
-    Citizen.CreateThread(function() while ESX == nil do TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end) Citizen.Wait(30) end end)
+    ESX = exports['es_extended']:getSharedObject()
 end
 
 LS_CORE.Functions.GetPlayer = function (source)
@@ -91,8 +89,9 @@ LS_CORE.Player.CreatePlayerData = function(source)
     Data.Reputation = Data.Reputation or 0
     Data.XP = Data.XP or 0
     Data.Skills = Data.Skills or { }
-    Data.cid = Data.cid or LS_CORE.Player.CreateCustomID(identifier)
+    Data.cid = Data.cid or LS_CORE.Player.CreateCustomID(identifier, false)
     Data.charinfo = Data.charinfo or LS_CORE.Player.CreateCharInfo(identifier) or { firstname = "none", lastname = "none", birthdate = "00/00/0000" }
+    Data.walletid = Data.walletid or LS_CORE.Player.CreateCustomID(identifier, true)
 
 
     local createdUser = LS_CORE.Player.CreatePlayer(source, Data)
@@ -186,7 +185,7 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
             if (LS_CORE.Config.FRAMEWORK == "QB") then
                 self.Player.Functions.AddItem(item, amount, slot, info)
             elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
-                self.Player.addInventoryItem(item, amount)
+                self.Player.addInventoryItem(item, amount, info)
             end 
         end
     end
@@ -303,8 +302,8 @@ function LS_CORE.Player.Save(source)
     end
 end
 
-function LS_CORE.Player.CreateCustomID(identifier)
-    if (LS_CORE.Config.FRAMEWORK == "QB") then return identifier end
+function LS_CORE.Player.CreateCustomID(identifier, avoid)
+    if (LS_CORE.Config.FRAMEWORK == "QB") and not avoid then return identifier end
 
     local fnd = true
     local cid = nil
@@ -345,8 +344,9 @@ RegisterCommand("convertplayers", function(src)
                         Data.Reputation = 0
                         Data.XP = 0
                         Data.Skills = { }
-                        Data.cid = LS_CORE.Player.CreateCustomID(identifier)
+                        Data.cid = LS_CORE.Player.CreateCustomID(identifier, false)
                         Data.charinfo = { firstname = v.charinfo.firstname, lastname = v.charinfo.lastname, birthdate = v.charinfo.birthdate } or { firstname = "none", lastname = "none", birthdate = "00/00/0000" }
+                        Data.walletid = Data.walletid or LS_CORE.Player.CreateCustomID(identifier, true)
 
                         LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'INSERT INTO `ls_core` (identifier, data) VALUES (@identifier, @data)', {
                             ["@identifier"] = identifier,
@@ -369,8 +369,9 @@ RegisterCommand("convertplayers", function(src)
                         Data.Reputation = 0
                         Data.XP = 0
                         Data.Skills = { }
-                        Data.cid = LS_CORE.Player.CreateCustomID(identifier)
+                        Data.cid = LS_CORE.Player.CreateCustomID(identifier, false)
                         Data.charinfo = { firstname = v.firstname, lastname = v.lastname, birthdate = v.birthdate } or { firstname = "none", lastname = "none", birthdate = "00/00/0000" }
+                        Data.walletid = Data.walletid or LS_CORE.Player.CreateCustomID(identifier, true)
 
                         LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'INSERT INTO `ls_core` (identifier, data) VALUES (@identifier, @data)', {
                             ["@identifier"] = identifier,
