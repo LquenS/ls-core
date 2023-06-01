@@ -192,7 +192,7 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
 
     self.Functions.RemoveItem = function(item, amount, slot)
         if GetResourceState("ls-inventoryhud") ~= 'missing' then
-            exports["ls-inventoryhud"]:RemoveItem(self.PlayerData.source, slot, amount)
+            exports["ls-inventoryhud"]:RemoveItem(self.Source, slot, amount)
         else
             if (LS_CORE.Config.FRAMEWORK == "QB") then
                 self.Player.Functions.RemoveItem(item, amount, slot)
@@ -204,9 +204,9 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
 
     self.Functions.GetItem = function(item)
         if GetResourceState("ls-inventoryhud") ~= 'missing' then
-            local foundItem = exports["ls-inventoryhud"]:GetItem(self.PlayerData.source, item)
+            local foundItem = exports["ls-inventoryhud"]:GetItem(self.Source, item)
             if foundItem == nil then
-                for _,v in pairs ( exports["ls-inventoryhud"]:GetItems(self.PlayerData.source) ) do
+                for _,v in pairs ( exports["ls-inventoryhud"]:GetItems(self.Source) ) do
                     if (v._tpl == item) then
                         foundItem = v
                         break
@@ -219,7 +219,7 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
             if (LS_CORE.Config.FRAMEWORK == "QB") then
                 return self.Player.Functions.GetItemByName(item)
             elseif (LS_CORE.Config.FRAMEWORK == "ESX") then
-                return self.Player.getItem(item)
+                return self.Player.getInventoryItem(item)
             end 
         end
     end
