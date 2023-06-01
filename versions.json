@@ -30,9 +30,9 @@
         "name": "ls-mdt-v2"
     },
 	{
-        "version": "1.0.0",
-        "version_name": "Release",
-        "version_desc": "Phone has been released.",
+        "version": "1.1.0",
+        "version_name": "Update",
+        "version_desc": "https://lquensdocs.gitbook.io/lquens/ls-phone/changelog#update-1.1.0",
         "name": "ls-phone"
     }
 ]
