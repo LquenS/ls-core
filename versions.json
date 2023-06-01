@@ -30,9 +30,9 @@
         "name": "ls-mdt-v2"
     },
 	{
-        "version": "0.9.9",
-        "version_name": "Development",
-        "version_desc": "New updates, fixes and phone improvements made.",
+        "version": "1.0.0",
+        "version_name": "Release",
+        "version_desc": "Phone has been released.",
         "name": "ls-phone"
     }
 ]
