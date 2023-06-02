@@ -4,13 +4,15 @@ LS_CORE.Functions.GetVersionScript = function(CURRENT_VERSION, SCRIPT_NAME)
             local SCRIPT_LIST = json.decode(data)
             for _, value in pairs ( SCRIPT_LIST ) do 
                 if value.name == SCRIPT_NAME then
-                    print("[ls-core] " .. SCRIPT_NAME .. " checking started.")
-                    Citizen.Wait(500)
+                    print("[================================================================================]\n")
+                    print("^1["..SCRIPT_NAME.."] ^7 checking started.")
                     if value.version == CURRENT_VERSION then
-                        print("[ls-core] " ..SCRIPT_NAME.. " version is latest\n[ls-core] Version name " .. value.version_name..".\n".."[ls-core] " .. value.version_desc..".")
+                        print("^2[" ..SCRIPT_NAME.. "] VERSION IS LATEST\n[" ..SCRIPT_NAME.. "] VERSION TITLE ^3" .. value.version_name.."^2.\n".."[" ..SCRIPT_NAME.. "] ^3" .. value.version_desc.."^2.^7")
                     else
-                        print("[ls-core] " ..SCRIPT_NAME.. " is outdated, needs to be updated!\n[ls-core] Latest version is " .. value.version .. ".")
+                        print("^8[" ..SCRIPT_NAME.. "] ^1IS OUTDATED, NEEDS TO BE UPDATED!^8\n[" ..SCRIPT_NAME.. "] ^1LATEST VERSION IS^8 ^3" .. value.version .. "^8.^7")
+                        LS_CORE.Functions.CreateUpdateLoop("[================================================================================]\n".."^8[" ..SCRIPT_NAME.. "] ^1IS OUTDATED, NEEDS TO BE UPDATED!^8\n[" ..SCRIPT_NAME.. "] ^1LATEST VERSION IS^8 ^3" .. value.version .. "^8.^7".."\n[================================================================================]")
                     end
+                    print("\n[================================================================================]")
                 end
             end
         else
@@ -19,9 +21,18 @@ LS_CORE.Functions.GetVersionScript = function(CURRENT_VERSION, SCRIPT_NAME)
     end)
 end
 
+LS_CORE.Functions.CreateUpdateLoop = function(PRINT)
+    Citizen.CreateThread(function()
+        while true do
+            Citizen.Wait(2500)
+            print(PRINT)
+        end
+    end)
+end
+
 Citizen.CreateThread(function()
-    Citizen.Wait(1000)
-    LS_CORE.Functions.GetVersionScript(LS_CORE.Config.VERSION, "ls-core")
+    Citizen.Wait(500)
+    LS_CORE.Functions.GetVersionScript(GetResourceMetadata("ls-core", "version"), "ls-core")
 end)
 
 exports("CheckVersion", LS_CORE.Functions.GetVersionScript)
