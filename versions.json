@@ -30,9 +30,9 @@
         "name": "ls-mdt-v2"
     },
 	{
-        "version": "1.3.1",
-        "version_name": "UI Overhaul",
-        "version_desc": "https://lquensdocs.gitbook.io/lquens/ls-phone/changelog#update-1.3.1",
+        "version": "1.4.1",
+        "version_name": "Drag & Click",
+        "version_desc": "https://lquensdocs.gitbook.io/lquens/ls-phone/changelog#update-1.4.1",
         "name": "ls-phone"
     }
 ]
