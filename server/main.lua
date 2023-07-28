@@ -92,6 +92,7 @@ LS_CORE.Player.CreatePlayerData = function(source)
     Data.cid = Data.cid or LS_CORE.Player.CreateCustomID(identifier, false)
     Data.charinfo = Data.charinfo or LS_CORE.Player.CreateCharInfo(identifier) or { firstname = "none", lastname = "none", birthdate = "00/00/0000" }
     Data.walletid = Data.walletid or LS_CORE.Player.CreateCustomID(identifier, true)
+    Data.items = GetResourceState('ls-inventory') ~= 'missing' and exports['ls-inventory']:LoadInventory(source, identifier) or {}
 
 
     local createdUser = LS_CORE.Player.CreatePlayer(source, Data)
@@ -179,7 +180,7 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
 
 
     self.Functions.AddItem = function(item, amount, slot, info)
-        if GetResourceState("ls-inventoryhud") ~= 'missing' then
+        if GetResourceState("ls-inventoryhud") == 'started' then
             exports["ls-inventoryhud"]:AddItem(self.Source, item, amount, info)
         else
             if (LS_CORE.Config.FRAMEWORK == "QB") then
@@ -191,7 +192,7 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
     end
 
     self.Functions.RemoveItem = function(item, amount, slot)
-        if GetResourceState("ls-inventoryhud") ~= 'missing' then
+        if GetResourceState("ls-inventoryhud") == 'started' then
             exports["ls-inventoryhud"]:RemoveItem(self.Source, slot, amount)
         else
             if (LS_CORE.Config.FRAMEWORK == "QB") then
@@ -203,7 +204,7 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
     end
 
     self.Functions.GetItem = function(item)
-        if GetResourceState("ls-inventoryhud") ~= 'missing' then
+        if GetResourceState("ls-inventoryhud") == 'started' then
             local foundItem = exports["ls-inventoryhud"]:GetItem(self.Source, item)
             if foundItem == nil then
                 for _,v in pairs ( exports["ls-inventoryhud"]:GetItems(self.Source) ) do
@@ -280,6 +281,12 @@ end
 function LS_CORE.Player.Save(source)
     local PlayerData = LS_CORE.Players[source]
     if PlayerData then
+        -- If using ls-inventory save Inventory if not do not do anything
+        if GetResourceState("ls-inventory") == "started" then exports["ls-inventory"]:SaveInventory(PlayerData.DATA, true) end
+
+        -- Clean items, because after logout never used again for this reason there is no reason to save again.
+        PlayerData.DATA.items = {} 
+
         local IsValid = LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'fetchAll', 'SELECT * FROM ls_core where identifier = ?', { PlayerData.Identifier })
         if IsValid[1] then
             LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'UPDATE `ls_core` SET `data` = @data WHERE `identifier` = @identifier', {
@@ -287,10 +294,6 @@ function LS_CORE.Player.Save(source)
                 ['@data']       = json.encode(PlayerData.DATA),
             })
         else
-            -- LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'INSERT INTO `ls_core` (identifier, data) VALUES (:identifier, :data)', {
-                -- identifier = PlayerData.Identifier,
-                -- data = json.encode(PlayerData.DATA),
-            -- })
 			LS_CORE.Config.DATABASE( LS_CORE.Config.DATABASE_NAME, 'execute', 'INSERT INTO `ls_core` (identifier, data) VALUES (@identifier, @data)', {
                 ["@identifier"] = PlayerData.Identifier,
                 ["data"] = json.encode(PlayerData.DATA),
@@ -325,6 +328,9 @@ AddEventHandler('playerDropped', function()
     
     Player.Functions.Save()
     LS_CORE.Players[src] = nil
+
+    TriggerClientEvent("LS_CORE:PLAYER:PLAYERUNLOAD", src)
+    TriggerEvent("LS_CORE:PLAYER:PLAYERUNLOAD")
 end)
 
 RegisterCommand("convertplayers", function(src)
