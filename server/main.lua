@@ -181,7 +181,9 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
 
     self.Functions.AddItem = function(item, amount, slot, info)
         if GetResourceState("ls-inventoryhud") == 'started' then
-            exports["ls-inventoryhud"]:AddItem(self.Source, item, amount, info)
+            exports["ls-inventoryhud"]:AddItem(self.Source, item, amount, slot, info)
+        elseif GetResourceState("ls-inventory") == 'started' then
+            exports["ls-inventory"]:AddItem(self.Source, item, amount, slot)
         else
             if (LS_CORE.Config.FRAMEWORK == "QB") then
                 self.Player.Functions.AddItem(item, amount, slot, info)
@@ -194,6 +196,8 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
     self.Functions.RemoveItem = function(item, amount, slot)
         if GetResourceState("ls-inventoryhud") == 'started' then
             exports["ls-inventoryhud"]:RemoveItem(self.Source, slot, amount)
+        elseif GetResourceState("ls-inventory") == 'started' then
+            exports["ls-inventory"]:RemoveItem(self.Source, item, amount, slot)
         else
             if (LS_CORE.Config.FRAMEWORK == "QB") then
                 self.Player.Functions.RemoveItem(item, amount, slot)
@@ -216,6 +220,8 @@ LS_CORE.Player.CreatePlayer = function(source, PLAYER_DATA)
             end
 
             return foundItem
+        elseif GetResourceState("ls-inventory") == 'started' then
+            exports["ls-inventory"]:GetItemByName(self.Source, item)
         else
             if (LS_CORE.Config.FRAMEWORK == "QB") then
                 return self.Player.Functions.GetItemByName(item)
