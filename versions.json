@@ -34,5 +34,11 @@
         "version_name": "Drag & Click",
         "version_desc": "https://lquensdocs.gitbook.io/lquens/ls-phone/changelog#update-1.4.1",
         "name": "ls-phone"
+    },
+    {
+        "version": "1.0.0",
+        "version_name": "Released",
+        "version_desc": "The inventory is released",
+        "name": "ls-inventory"
     }
 ]
