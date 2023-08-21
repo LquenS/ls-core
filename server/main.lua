@@ -24,7 +24,7 @@ end)
 
 LS_CORE.Functions.GetIdentifier = function (id)
     for src in pairs(LS_CORE.Players) do
-        if LS_CORE.Players[src].DATA.identifier == id then
+        if LS_CORE.Players[src].DATA.identifier == id or LS_CORE.Players[src].DATA.cid == id then
             local Player = LS_CORE.Players[src]
             Player.RefreshPlayer()
 
