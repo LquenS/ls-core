@@ -92,7 +92,7 @@ LS_CORE.Player.CreatePlayerData = function(source)
     Data.cid = Data.cid or LS_CORE.Player.CreateCustomID(identifier, false)
     Data.charinfo = Data.charinfo or LS_CORE.Player.CreateCharInfo(identifier) or { firstname = "none", lastname = "none", birthdate = "00/00/0000" }
     Data.walletid = Data.walletid or LS_CORE.Player.CreateCustomID(identifier, true)
-    Data.items = GetResourceState('ls-inventory') ~= 'missing' and exports['ls-inventory']:LoadInventory(source, identifier) or {}
+    Data.items = GetResourceState('ls-inventory') ~= 'missing' and exports['ls-inventory']:LoadInventory(source, Data.cid) or {}
     Data.craftinghistory = Data.craftinghistory or {}
 
 
