@@ -61,6 +61,9 @@ LS_CORE.Functions.GetPlayerFrameworkIdentifier = function (identifier)
     return Player
 end
 
+LS_CORE.Functions.GetPlayers = function ()
+    return LS_CORE.Players
+end
 
 LS_CORE.Functions.GetPlayerIdentifier = function (source)
     local Identifier = nil
