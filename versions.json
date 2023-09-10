@@ -40,5 +40,11 @@
         "version_name": "Released",
         "version_desc": "The inventory is released",
         "name": "ls-inventory"
+    },
+    {
+        "version": "1.0.0",
+        "version_name": "Released",
+        "version_desc": "The mdt v3 is released",
+        "name": "ls-mdt-v3"
     }
 ]
